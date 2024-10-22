@@ -213,6 +213,11 @@ public class SavingsAccountReadPlatformServiceImpl implements SavingsAccountRead
                 objectArray[arrayPos] = searchParameters.getOfficeId();
                 arrayPos = arrayPos + 1;
             }
+            if (searchParameters.getClientBirthday() != null) {
+                sqlBuilder.append(" and c.date_of_birth = ?");
+                objectArray[arrayPos] = searchParameters.getClientBirthday();
+                arrayPos = arrayPos + 1;
+            }
             if (searchParameters.isOrderByRequested()) {
                 sqlBuilder.append(" order by ").append(searchParameters.getOrderBy());
                 this.columnValidator.validateSqlInjection(sqlBuilder.toString(), searchParameters.getOrderBy());
