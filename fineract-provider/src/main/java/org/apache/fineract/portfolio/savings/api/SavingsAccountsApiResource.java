@@ -41,6 +41,7 @@ import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.UriInfo;
 import java.io.InputStream;
+import java.time.Month;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
@@ -129,16 +130,40 @@ public class SavingsAccountsApiResource {
             @QueryParam("limit") @Parameter(description = "limit") final Integer limit,
             @QueryParam("orderBy") @Parameter(description = "orderBy") final String orderBy,
             @QueryParam("sortOrder") @Parameter(description = "sortOrder") final String sortOrder,
-            @QueryParam("clientBirthday") @Parameter(description = "clientBirthday") final String clientBirthday) {
+            @QueryParam("clientBirthMonth") @Parameter(description = "clientBirthMonth") final Integer clientBirthMonth,
+            @QueryParam("clientBirthDay") @Parameter(description = "clientBirthDay") final Integer clientBirthDay) {
 
         context.authenticatedUser().validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
 
-        final SearchParameters searchParameters = SearchParameters.forSavings(sqlSearch, externalId, offset, limit, orderBy, sortOrder, clientBirthday);
+        validateClientBirthday(clientBirthMonth, clientBirthDay);
+
+        final SearchParameters searchParameters = SearchParameters.forSavings(sqlSearch, externalId, offset, limit, orderBy, sortOrder, clientBirthMonth, clientBirthDay);
 
         final Page<SavingsAccountData> products = savingsAccountReadPlatformService.retrieveAll(searchParameters);
 
         final ApiRequestJsonSerializationSettings settings = apiRequestParameterHelper.process(uriInfo.getQueryParameters());
         return toApiJsonSerializer.serialize(settings, products, SavingsApiSetConstants.SAVINGS_ACCOUNT_RESPONSE_DATA_PARAMETERS);
+    }
+
+    private void validateClientBirthday(final Integer clientBirthMonth, final Integer clientBirthDay) {
+        // require both month and day to be present
+        if (clientBirthMonth != null && clientBirthDay == null) {
+            throw new UnrecognizedQueryParamException("clientBirthDay", null, new Object[] { "clientBirthDay" });
+        }
+        if (clientBirthDay != null && clientBirthMonth == null) {
+            throw new UnrecognizedQueryParamException("clientBirthMonth", null, new Object[] { "clientBirthMonth" });
+        }
+        if (clientBirthDay != null && clientBirthMonth != null) {
+            // validate month
+            if (clientBirthMonth < 1 || clientBirthMonth > 12) {
+                throw new UnrecognizedQueryParamException("clientBirthMonth", clientBirthMonth.toString(), new Object[] { "1-12" });
+            }
+            // validate day of month
+            final int daysInMonth = Month.of(clientBirthMonth).length(true);
+            if (clientBirthDay < 1 || clientBirthDay > daysInMonth) {
+                throw new UnrecognizedQueryParamException("clientBirthDay", clientBirthDay.toString(), new Object[] { "1-" + daysInMonth });
+            }
+        }
     }
 
     @POST
