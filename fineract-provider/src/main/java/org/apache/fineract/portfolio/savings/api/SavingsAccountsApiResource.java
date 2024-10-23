@@ -146,23 +146,25 @@ public class SavingsAccountsApiResource {
     }
 
     private void validateClientBirthday(final Integer clientBirthMonth, final Integer clientBirthDay) {
+        // ignore if neither are present
+        if (clientBirthMonth == null && clientBirthDay == null) {
+            return;
+        }
         // require both month and day to be present
-        if (clientBirthMonth != null && clientBirthDay == null) {
-            throw new UnrecognizedQueryParamException("clientBirthDay", null, new Object[] { "clientBirthDay" });
+        if (clientBirthMonth == null) {
+            throw new UnrecognizedQueryParamException("clientBirthMonth", null, "1-12");
         }
-        if (clientBirthDay != null && clientBirthMonth == null) {
-            throw new UnrecognizedQueryParamException("clientBirthMonth", null, new Object[] { "clientBirthMonth" });
+        final int daysInMonth = Month.of(clientBirthMonth).length(true);
+        if (clientBirthDay == null) {
+            throw new UnrecognizedQueryParamException("clientBirthDay", null, "1-" + daysInMonth);
         }
-        if (clientBirthDay != null && clientBirthMonth != null) {
-            // validate month
-            if (clientBirthMonth < 1 || clientBirthMonth > 12) {
-                throw new UnrecognizedQueryParamException("clientBirthMonth", clientBirthMonth.toString(), new Object[] { "1-12" });
-            }
-            // validate day of month
-            final int daysInMonth = Month.of(clientBirthMonth).length(true);
-            if (clientBirthDay < 1 || clientBirthDay > daysInMonth) {
-                throw new UnrecognizedQueryParamException("clientBirthDay", clientBirthDay.toString(), new Object[] { "1-" + daysInMonth });
-            }
+        // validate month
+        if (clientBirthMonth < 1 || clientBirthMonth > 12) {
+            throw new UnrecognizedQueryParamException("clientBirthMonth", clientBirthMonth.toString(), "1-12" );
+        }
+        // validate day of month
+        if (clientBirthDay < 1 || clientBirthDay > daysInMonth) {
+            throw new UnrecognizedQueryParamException("clientBirthDay", clientBirthDay.toString(), "1-" + daysInMonth);
         }
     }
 
