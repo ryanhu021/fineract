@@ -3193,6 +3193,29 @@ public class ClientSavingsIntegrationTest {
         GlobalConfigurationHelper.updateValueForGlobalConfiguration(requestSpec, responseSpec, "39", "5");
     }
 
+    @Test
+    public void testSavingsAccountGetAll() {
+        this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
+        final Integer clientID = ClientHelper.createClient(this.requestSpec, this.responseSpec);
+        final String minBalanceForInterestCalculation = null;
+        final String minRequiredBalance = null;
+        final String enforceMinRequiredBalance = "false";
+        final boolean allowOverdraft = false;
+
+        final Integer savingsProductID = createSavingsProduct(this.requestSpec, this.responseSpec, MINIMUM_OPENING_BALANCE,
+                minBalanceForInterestCalculation, minRequiredBalance, enforceMinRequiredBalance, allowOverdraft);
+        Assertions.assertNotNull(savingsProductID);
+
+        final Integer savingsId = this.savingsAccountHelper.applyForSavingsApplication(clientID, savingsProductID, ACCOUNT_TYPE_INDIVIDUAL);
+        Assertions.assertNotNull(savingsId);
+
+        final Integer savingsId2 = this.savingsAccountHelper.applyForSavingsApplication(clientID, savingsProductID, ACCOUNT_TYPE_INDIVIDUAL);
+        Assertions.assertNotNull(savingsId2);
+
+        final Object[] response = this.savingsAccountHelper.getSavingsAccounts();
+        Assertions.assertTrue(response.length >= 2);
+    }
+
     @AfterEach
     public void tearDown() {
         GlobalConfigurationHelper.resetAllDefaultGlobalConfigurations(this.requestSpec, this.responseSpec);
