@@ -928,12 +928,12 @@ public class SavingsAccountHelper {
                 updateGsimJSON(clientID.toString(), groupID.toString(), productID.toString()), "");
     }
 
-    public Object[] getSavingsAccounts() {
+    public ArrayList<Object> getSavingsAccounts() {
         final String URL = SAVINGS_ACCOUNT_URL + "?" + Utils.TENANT_IDENTIFIER;
         return Utils.performServerGet(requestSpec, responseSpec, URL, "pageItems");
     }
 
-    public Object[] getSavingsAccountsByBirthday(final int month, final int day) {
+    public ArrayList<Object> getSavingsAccountsByBirthday(final int month, final int day) {
         final String URL = SAVINGS_ACCOUNT_URL + "?clientBirthMonth=" + month + "&clientBirthDay=" + day + "&" + Utils.TENANT_IDENTIFIER;
         return Utils.performServerGet(requestSpec, responseSpec, URL, "pageItems");
     }
