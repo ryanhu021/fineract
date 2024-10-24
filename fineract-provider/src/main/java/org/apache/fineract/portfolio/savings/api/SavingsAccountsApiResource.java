@@ -154,14 +154,14 @@ public class SavingsAccountsApiResource {
         if (clientBirthMonth == null) {
             throw new UnrecognizedQueryParamException("clientBirthMonth", null, "1-12");
         }
-        final int daysInMonth = Month.of(clientBirthMonth).length(true);
         if (clientBirthDay == null) {
-            throw new UnrecognizedQueryParamException("clientBirthDay", null, "1-" + daysInMonth);
+            throw new UnrecognizedQueryParamException("clientBirthDay", null, "1-31");
         }
         // validate month
         if (clientBirthMonth < 1 || clientBirthMonth > 12) {
             throw new UnrecognizedQueryParamException("clientBirthMonth", clientBirthMonth.toString(), "1-12" );
         }
+        final int daysInMonth = Month.of(clientBirthMonth).length(true);
         // validate day of month
         if (clientBirthDay < 1 || clientBirthDay > daysInMonth) {
             throw new UnrecognizedQueryParamException("clientBirthDay", clientBirthDay.toString(), "1-" + daysInMonth);
