@@ -150,21 +150,16 @@ public class SavingsAccountsApiResource {
         if (clientBirthMonth == null && clientBirthDay == null) {
             return;
         }
-        // require both month and day to be present
-        if (clientBirthMonth == null) {
-            throw new UnrecognizedQueryParamException("clientBirthMonth", null, "1-12");
-        }
-        if (clientBirthDay == null) {
-            throw new UnrecognizedQueryParamException("clientBirthDay", null, "1-31");
-        }
         // validate month
-        if (clientBirthMonth < 1 || clientBirthMonth > 12) {
-            throw new UnrecognizedQueryParamException("clientBirthMonth", clientBirthMonth.toString(), "1-12" );
+        if (clientBirthMonth == null || clientBirthMonth < 1 || clientBirthMonth > 12) {
+            throw new UnrecognizedQueryParamException("clientBirthMonth", clientBirthMonth == null ? null : clientBirthMonth.toString(),
+                    "1-12");
         }
         final int daysInMonth = Month.of(clientBirthMonth).length(true);
         // validate day of month
-        if (clientBirthDay < 1 || clientBirthDay > daysInMonth) {
-            throw new UnrecognizedQueryParamException("clientBirthDay", clientBirthDay.toString(), "1-" + daysInMonth);
+        if (clientBirthDay == null || clientBirthDay < 1 || clientBirthDay > daysInMonth) {
+            throw new UnrecognizedQueryParamException("clientBirthDay", clientBirthDay == null ? null : clientBirthDay.toString(),
+                    "1-" + daysInMonth);
         }
     }
 

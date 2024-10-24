@@ -26,20 +26,12 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import org.apache.fineract.infrastructure.businessdate.domain.BusinessDateType;
-import org.apache.fineract.infrastructure.core.domain.ActionContext;
-import org.apache.fineract.infrastructure.core.domain.FineractPlatformTenant;
 import org.apache.fineract.infrastructure.core.service.Page;
 import org.apache.fineract.infrastructure.core.service.PaginationHelper;
 import org.apache.fineract.infrastructure.core.service.SearchParameters;
-import org.apache.fineract.infrastructure.core.service.ThreadLocalContextUtil;
 import org.apache.fineract.infrastructure.core.service.database.DatabaseSpecificSQLGenerator;
 import org.apache.fineract.infrastructure.dataqueries.service.EntityDatatableChecksReadService;
 import org.apache.fineract.infrastructure.security.service.PlatformSecurityContext;
@@ -101,11 +93,6 @@ public class SavingsAccountReadPlatformServiceTest {
 
     @BeforeEach
     public void setUp() {
-        ThreadLocalContextUtil.setTenant(new FineractPlatformTenant(1L, "default", "Default", "Asia/Kolkata", null));
-        ThreadLocalContextUtil.setActionContext(ActionContext.DEFAULT);
-        ThreadLocalContextUtil
-                .setBusinessDates(
-                        new HashMap<>(Map.of(BusinessDateType.BUSINESS_DATE, LocalDate.now(ZoneId.systemDefault()))));
         underTest = new SavingsAccountReadPlatformServiceImpl(context, jdbcTemplate, clientReadPlatformService,
                 groupReadPlatformService,
                 savingProductReadPlatformService, staffReadPlatformService, dropdownReadPlatformService,

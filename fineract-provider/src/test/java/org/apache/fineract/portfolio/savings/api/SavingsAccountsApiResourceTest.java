@@ -122,11 +122,17 @@ public class SavingsAccountsApiResourceTest {
     @Test
     public void testRetrieveAllWithClientBirthMonthAndDay() {
         // when
+        when(savingsAccountReadPlatformService.retrieveAll(any())).thenReturn(savingsAccountDataPage);
+
         underTest.retrieveAll(uriInfo, null, null, null, null, null, null, clientBirthMonth, clientBirthDay);
 
         // then
+        verify(context.authenticatedUser(), times(1))
+                .validateHasReadPermission(SavingsApiConstants.SAVINGS_ACCOUNT_RESOURCE_NAME);
         searchParametersMockedStatic.verify(() -> SearchParameters.forSavings(any(), any(), any(), any(), any(), any(),
                 eq(clientBirthMonth), eq(clientBirthDay)));
+        verify(savingsAccountReadPlatformService, times(1)).retrieveAll(searchParameters);
+        verify(toApiJsonSerializer, times(1)).serialize(any(), eq(savingsAccountDataPage), any());
     }
 
     @Test
