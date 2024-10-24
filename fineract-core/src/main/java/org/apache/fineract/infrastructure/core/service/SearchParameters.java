@@ -49,6 +49,9 @@ public final class SearchParameters {
     private final Long productId;
     private final Long categoryId;
     private final boolean isSelfUser;
+    
+    private final Integer clientBirthMonth;
+    private final Integer clientBirthDay;
 
     public static SearchParameters from(final String sqlSearch, final Long officeId, final String externalId, final String name,
             final String hierarchy) {
@@ -182,7 +185,7 @@ public final class SearchParameters {
     }
 
     public static SearchParameters forSavings(final String sqlSearch, final String externalId, final Integer offset, final Integer limit,
-            final String orderBy, final String sortOrder) {
+            final String orderBy, final String sortOrder, final Integer clientBirthMonth, final Integer clientBirthDay) {
 
         final Integer maxLimitAllowed = getCheckedLimit(limit);
         final Long staffId = null;
@@ -192,8 +195,7 @@ public final class SearchParameters {
         final Boolean orphansOnly = false;
         final boolean isSelfUser = false;
 
-        return new SearchParameters(sqlSearch, null, externalId, null, null, null, null, offset, maxLimitAllowed, orderBy, sortOrder,
-                staffId, accountNo, loanId, savingsId, orphansOnly, isSelfUser);
+        return new SearchParameters(sqlSearch, externalId, offset, maxLimitAllowed, orderBy, sortOrder, staffId, accountNo, loanId, savingsId, orphansOnly, isSelfUser, clientBirthMonth, clientBirthDay);
     }
 
     public static SearchParameters forAccountTransfer(final String sqlSearch, final String externalId, final Integer offset,
@@ -268,6 +270,8 @@ public final class SearchParameters {
         this.productId = null;
         this.categoryId = null;
         this.isSelfUser = isSelfUser;
+        this.clientBirthMonth = null;
+        this.clientBirthDay = null;
         this.status = null;
 
     }
@@ -297,6 +301,8 @@ public final class SearchParameters {
         this.productId = null;
         this.categoryId = null;
         this.isSelfUser = isSelfUser;
+        this.clientBirthMonth = null;
+        this.clientBirthDay = null;
         this.status = status;
 
     }
@@ -326,6 +332,8 @@ public final class SearchParameters {
         this.productId = null;
         this.categoryId = null;
         this.isSelfUser = isSelfUser;
+        this.clientBirthMonth = null;
+        this.clientBirthDay = null;
         this.status = null;
     }
 
@@ -352,6 +360,8 @@ public final class SearchParameters {
         this.productId = productId;
         this.categoryId = categoryId;
         this.isSelfUser = false;
+        this.clientBirthMonth = null;
+        this.clientBirthDay = null;
         this.status = null;
 
     }
@@ -381,6 +391,39 @@ public final class SearchParameters {
         this.productId = null;
         this.categoryId = null;
         this.isSelfUser = false;
+        this.clientBirthMonth = null;
+        this.clientBirthDay = null;
+        this.status = null;
+
+    }
+
+    private SearchParameters(final String sqlSearch, final String externalId, final Integer offset, final Integer limit,
+            final String orderBy, final String sortOrder, final Long staffId, final String accountNo, final Long loanId,
+            final Long savingsId, final Boolean orphansOnly, boolean isSelfUser, final Integer clientBirthMonth,
+            final Integer clientBirthDay) {
+        this.sqlSearch = sqlSearch;
+        this.officeId = null;
+        this.externalId = externalId;
+        this.name = null;
+        this.hierarchy = null;
+        this.firstname = null;
+        this.lastname = null;
+        this.offset = offset;
+        this.limit = limit;
+        this.orderBy = orderBy;
+        this.sortOrder = sortOrder;
+        this.staffId = staffId;
+        this.accountNo = accountNo;
+        this.loanId = loanId;
+        this.savingsId = savingsId;
+        this.orphansOnly = orphansOnly;
+        this.currencyCode = null;
+        this.provisioningEntryId = null;
+        this.productId = null;
+        this.categoryId = null;
+        this.isSelfUser = isSelfUser;
+        this.clientBirthMonth = clientBirthMonth;
+        this.clientBirthDay = clientBirthDay;
         this.status = null;
 
     }
@@ -542,6 +585,14 @@ public final class SearchParameters {
 
     public boolean isSelfUser() {
         return this.isSelfUser;
+    }
+    
+    public Integer getClientBirthMonth() {
+        return this.clientBirthMonth;
+    }
+
+    public Integer getClientBirthDay() {
+        return this.clientBirthDay;
     }
 
     /**

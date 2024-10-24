@@ -37,8 +37,12 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+
 import org.apache.fineract.client.models.PostPaymentTypesRequest;
 import org.apache.fineract.client.models.PostPaymentTypesResponse;
 import org.apache.fineract.integrationtests.common.ClientHelper;
@@ -2534,6 +2538,77 @@ public class ClientSavingsIntegrationTest {
                 minBalanceForInterestCalculation, enforceMinRequiredBalance, allowOverdraft, overDraftLimit, lienAllowed, lineAllowedLimit);
         Assertions.assertNull(savingsProductID);
 
+    }
+
+    @Test
+    public void testSavingsAccountGetAll() {
+        this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
+
+        final Integer clientId = ClientHelper.createClient(this.requestSpec, this.responseSpec);
+        ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientId);
+
+        final String minBalanceForInterestCalculation = null;
+        final String minRequiredBalance = null;
+        final String enforceMinRequiredBalance = "false";
+        final boolean allowOverdraft = false;
+        final Integer savingsProductID = createSavingsProduct(this.requestSpec, this.responseSpec, MINIMUM_OPENING_BALANCE,
+                minBalanceForInterestCalculation, minRequiredBalance, enforceMinRequiredBalance, allowOverdraft);
+        Assertions.assertNotNull(savingsProductID);
+
+        Integer savingsId = this.savingsAccountHelper.applyForSavingsApplication(clientId, savingsProductID, ACCOUNT_TYPE_INDIVIDUAL);
+        Assertions.assertNotNull(savingsId);
+
+        savingsId = this.savingsAccountHelper.applyForSavingsApplication(clientId, savingsProductID, ACCOUNT_TYPE_INDIVIDUAL);
+        Assertions.assertNotNull(savingsId);
+
+        final List<Map> response = this.savingsAccountHelper.getSavingsAccounts();
+        Assertions.assertTrue(response.size() >= 2);
+    }
+
+    @Test
+    public void testSavingsAccountGetByBirthday() {
+        this.savingsAccountHelper = new SavingsAccountHelper(this.requestSpec, this.responseSpec);
+        
+        final LocalDate date1 = LocalDate.parse("2000-01-01");
+        final LocalDate date2 = LocalDate.parse("2000-02-29");
+        final LocalDate date3 = LocalDate.parse("2004-02-29");
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern(Utils.DATE_FORMAT);
+        final Integer clientId1 = ClientHelper.createClientAsPersonWithBirthday(requestSpec, responseSpec,
+                ClientHelper.DEFAULT_DATE, "1", date1.format(formatter));
+        ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientId1);
+        final Integer clientId2 = ClientHelper.createClientAsPersonWithBirthday(requestSpec, responseSpec,
+                ClientHelper.DEFAULT_DATE, "1", date2.format(formatter));
+        ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientId2);
+        final Integer clientId3 = ClientHelper.createClientAsPersonWithBirthday(requestSpec, responseSpec,
+                ClientHelper.DEFAULT_DATE, "1", date3.format(formatter));
+        ClientHelper.verifyClientCreatedOnServer(this.requestSpec, this.responseSpec, clientId3);
+
+        final String minBalanceForInterestCalculation = null;
+        final String minRequiredBalance = null;
+        final String enforceMinRequiredBalance = "false";
+        final boolean allowOverdraft = false;
+        final Integer savingsProductID = createSavingsProduct(this.requestSpec, this.responseSpec, MINIMUM_OPENING_BALANCE,
+                minBalanceForInterestCalculation, minRequiredBalance, enforceMinRequiredBalance, allowOverdraft);
+        Assertions.assertNotNull(savingsProductID);
+
+        Integer savingsId = this.savingsAccountHelper.applyForSavingsApplication(clientId1, savingsProductID, ACCOUNT_TYPE_INDIVIDUAL);
+        Assertions.assertNotNull(savingsId);
+        savingsId = this.savingsAccountHelper.applyForSavingsApplication(clientId2, savingsProductID, ACCOUNT_TYPE_INDIVIDUAL);
+        Assertions.assertNotNull(savingsId);
+        savingsId = this.savingsAccountHelper.applyForSavingsApplication(clientId3, savingsProductID, ACCOUNT_TYPE_INDIVIDUAL);
+        Assertions.assertNotNull(savingsId);
+
+        List<Map> response = this.savingsAccountHelper.getSavingsAccountsByBirthday(date1.getMonthValue(), date1.getDayOfMonth());
+        filterSavingsAccountsByClientIds(response, new HashSet<>(Arrays.asList(clientId1)));
+        Assertions.assertEquals(1, response.size());
+
+        response = this.savingsAccountHelper.getSavingsAccountsByBirthday(date2.getMonthValue(), date2.getDayOfMonth());
+        filterSavingsAccountsByClientIds(response, new HashSet<>(Arrays.asList(clientId2, clientId3)));
+        Assertions.assertEquals(2, response.size());
+    }
+
+    private void filterSavingsAccountsByClientIds(final List<Map> savingsAccounts, final Set<Integer> clientIds) {
+        savingsAccounts.removeIf(savingsAccount -> !clientIds.contains(savingsAccount.get("clientId")));
     }
 
     /**

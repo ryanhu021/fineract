@@ -273,6 +273,13 @@ public class ClientHelper extends IntegrationTest {
         return GSON.fromJson(response, PostClientsResponse.class);
     }
 
+    public static Integer createClientAsPersonWithBirthday(final RequestSpecification requestSpec,
+            final ResponseSpecification responseSpec, final String activationDate, final String officeId, final String dateOfBirth) {
+        log.info("---------------------------------CREATING A CLIENT PERSON WITH BIRTHDAY---------------------------------------------");
+        return Utils.performServerPost(requestSpec, responseSpec, CREATE_CLIENT_URL,
+                getTestPersonClientWithBirthdayAsJSON(activationDate, officeId, dateOfBirth), "clientId");
+    }
+
     public static Integer createClientAsEntity(final RequestSpecification requestSpec, final ResponseSpecification responseSpec) {
         return createClientAsEntity(requestSpec, responseSpec, DEFAULT_DATE);
     }
@@ -419,6 +426,23 @@ public class ClientHelper extends IntegrationTest {
         if (datatables != null) {
             map.put("datatables", Arrays.asList(datatables));
         }
+
+        log.info("map :  {}", map);
+        return GSON.toJson(map);
+    }
+
+    public static String getTestPersonClientWithBirthdayAsJSON(final String dateOfJoining, final String officeId,
+            final String dateOfBirth) {
+        final HashMap<String, Object> map = new HashMap<>();
+        map.put("officeId", officeId);
+        map.put("fullname", Utils.randomStringGenerator("Client_FullName_", 5));
+        map.put("externalId", UUID.randomUUID().toString());
+        map.put("dateFormat", Utils.DATE_FORMAT);
+        map.put("locale", "en");
+        map.put("active", "true");
+        map.put("activationDate", dateOfJoining);
+        map.put("legalFormId", 1);
+        map.put("dateOfBirth", dateOfBirth);
 
         log.info("map :  {}", map);
         return GSON.toJson(map);
