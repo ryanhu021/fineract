@@ -58,6 +58,10 @@ public class SavingsAccountsApiResourceTest {
     private static final MockedStatic<SearchParameters> searchParametersMockedStatic = mockStatic(
             SearchParameters.class);
 
+    private final Integer clientBirthMonth = 10;
+    private final Integer clientBirthDay = 20;
+    private final Page<SavingsAccountData> savingsAccountDataPage = new Page<>(Collections.emptyList(), 0);
+
     @Mock
     private SavingsAccountReadPlatformService savingsAccountReadPlatformService;
     @Mock
@@ -82,10 +86,6 @@ public class SavingsAccountsApiResourceTest {
     private SearchParameters searchParameters;
 
     private SavingsAccountsApiResource underTest;
-
-    Integer clientBirthMonth = 10;
-    Integer clientBirthDay = 20;
-    Page<SavingsAccountData> savingsAccountDataPage = new Page<>(Collections.emptyList(), 0);
 
     @BeforeEach
     public void setUp() {
